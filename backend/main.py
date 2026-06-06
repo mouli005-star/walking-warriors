@@ -1,11 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.database import create_tables
-from app.api import patients, donors, auth
+from app.api import patients, donors, auth, cascade
 
 app = FastAPI(
     title="BloodBridge API",
-    description="AI-powered blood coordination platform for Thalassemia patients",
+    description="Agentic AI blood coordination platform for Thalassemia patients",
     version="1.0.0"
 )
 
@@ -22,10 +22,10 @@ async def startup():
     create_tables()
     print("✓ BloodBridge API started")
 
-# ── ROUTERS ──────────────────────────────────────────────────────────────
+app.include_router(auth.router)
 app.include_router(patients.router)
 app.include_router(donors.router)
-app.include_router(auth.router)
+app.include_router(cascade.router)
 
 @app.get("/")
 def root():
