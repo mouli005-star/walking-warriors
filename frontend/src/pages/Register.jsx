@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { Heart, Users, UserCheck, Phone, ArrowRight, CheckCircle, Eye, EyeOff } from 'lucide-react'
 import { donors, patients } from '../services/api'
 import API from '../services/api'
+import RakshaChat from '../components/RakshaChat'
 
 // ── CITY OPTIONS with lat/long ──────────────────────────────────────────
 const CITIES = [
@@ -46,6 +47,66 @@ async function verifyOTP(phone, otp) {
     // Mock: accept 123456
     return { verified: otp === '123456' }
   }
+}
+
+function OCRUpload({ onExtracted }) {
+  const [uploading, setUploading] = useState(false)
+
+  async function handleFile(e) {
+    const file = e.target.files[0]
+    if (!file) return
+
+    setUploading(true)
+    const formData = new FormData()
+    formData.append('file', file)
+
+    try {
+      const res = await API.post('/ai/ocr-extract', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+      if (res.data.success) {
+        onExtracted(res.data.extracted)
+      }
+    } catch {}
+
+    setUploading(false)
+  }
+
+  return (
+    <div style={{
+      marginBottom: 18,
+      padding: 16,
+      border: '1px dashed var(--border)',
+      borderRadius: 12,
+      background: 'var(--bg-elevated)'
+    }}>
+      <label style={{ display: 'block', cursor: 'pointer' }}>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleFile}
+          style={{ display: 'none' }}
+        />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{
+            width: 42, height: 42,
+            borderRadius: 10,
+            background: 'rgba(192,57,43,0.12)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 18, flexShrink: 0
+          }}>📄</div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 3 }}>
+              {uploading ? 'Extracting details...' : 'Upload Hospital Document'}
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+              AI will auto-fill the form from prescription or discharge summary
+            </div>
+          </div>
+        </div>
+      </label>
+    </div>
+  )
 }
 
 // ── ROLE SELECTOR ─────────────────────────────────────────────────────────
@@ -467,6 +528,16 @@ function PatientForm({ phone, onSuccess }) {
         Register a Thalassemia patient to receive coordinated blood support
       </p>
 
+      <OCRUpload onExtracted={(data) => {
+        if (data.name) set('name', data.name)
+        if (data.blood_group) set('blood_group', data.blood_group)
+        if (data.hospital_name) set('hospital_name', data.hospital_name)
+        if (data.age) set('age', String(data.age))
+        if (data.recommended_transfusion_frequency) {
+          set('frequency_in_days', String(data.recommended_transfusion_frequency))
+        }
+      }}/>
+
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
         <Field label="Patient Full Name *">
           <input value={form.name} onChange={e => set('name', e.target.value)}
@@ -757,6 +828,27 @@ function SuccessScreen({ role }) {
         {msg.body}
       </p>
       <CheckCircle size={48} color="var(--green)" style={{ marginBottom: 20 }}/>
+      <a
+        href="https://wa.me/919959601905?text=Namaste%20Blood%20Warriors!"
+        target="_blank"
+        rel="noreferrer"
+        style={{
+          textDecoration: 'none',
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 8,
+          width: '100%',
+          padding: '12px 14px',
+          borderRadius: 10,
+          background: '#25D366',
+          color: 'white',
+          fontWeight: 700,
+          marginBottom: 14
+        }}>
+        💬
+        Chat with Blood Warriors on WhatsApp
+      </a>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         <Link to="/register" style={{ textDecoration: 'none' }}>
           <button className="btn-secondary" style={{ width: '100%', padding: 11 }}>
@@ -769,6 +861,7 @@ function SuccessScreen({ role }) {
           </button>
         </Link>
       </div>
+      <RakshaChat userType={role === 'patient' ? 'patient' : 'donor'} />
     </div>
   )
 }

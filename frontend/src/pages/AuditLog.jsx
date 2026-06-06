@@ -15,6 +15,15 @@ const EVENT_COLORS = {
   SYSTEM_SEED:              'var(--text-muted)',
 }
 
+const ALL_EVENT_TYPES = [
+  'ADMIN_LOGIN', 'CASCADE_TRIGGERED', 'STAGE_BLOOD_FAMILY_STARTED',
+  'STAGE_BACKUP_POOL_STARTED', 'STAGE_EXPANDED_STARTED',
+  'CASCADE_ADVANCED_TO_BACKUP_POOL', 'CASCADE_ADVANCED_TO_EXPANDED',
+  'CASCADE_ADVANCED_TO_BLOOD_BANK', 'CASCADE_ADVANCED_TO_NGO_ALERT',
+  'NGO_ALERT_TRIGGERED', 'AI_CASCADE_DECISION', 'DONOR_REPLIED',
+  'DONOR_REGISTERED', 'PATIENT_REGISTERED', 'OTP_SENT', 'SYSTEM_SEED'
+]
+
 export default function AuditLog() {
   const [logs,    setLogs]    = useState([])
   const [filter,  setFilter]  = useState('')
@@ -31,8 +40,6 @@ export default function AuditLog() {
   }
 
   useEffect(() => { load() }, [filter])
-
-  const eventTypes = [...new Set(logs.map(l => l.event_type).filter(Boolean))]
 
   return (
     <div>
@@ -67,9 +74,9 @@ export default function AuditLog() {
           style={{ padding: '5px 12px', fontSize: 11 }}>
           All Events
         </button>
-        {eventTypes.map(t => (
+        {ALL_EVENT_TYPES.map(t => (
           <button key={t}
-            onClick={() => setFilter(t)}
+            onClick={() => setFilter(filter === t ? '' : t)}
             className={filter === t ? 'btn-primary' : 'btn-secondary'}
             style={{ padding: '5px 12px', fontSize: 11 }}>
             {t.replace(/_/g, ' ')}

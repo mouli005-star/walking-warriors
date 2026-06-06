@@ -19,7 +19,7 @@ export default function Sidebar({ collapsed, onToggle }) {
   const navigate = useNavigate()
   const adminRaw = localStorage.getItem('bb_admin')
   const admin = adminRaw ? JSON.parse(adminRaw) : { name: 'Admin' }
-  const width = collapsed ? 64 : 240
+  const W = collapsed ? 64 : 240
 
   function logout() {
     localStorage.removeItem('bb_token')
@@ -29,7 +29,7 @@ export default function Sidebar({ collapsed, onToggle }) {
 
   return (
     <aside style={{
-      width: width, minHeight: '100vh',
+      width: W, minHeight: '100vh',
       background: '#111C2D',
       borderRight: '1px solid #1E2D45',
       display: 'flex', flexDirection: 'column',

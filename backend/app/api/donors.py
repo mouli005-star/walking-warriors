@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from app.core.database import get_db
-from app.models.models import Donor, BloodFamily, EventLog
+from app.models.models import Donor, Patient, BloodFamily, EventLog
 from typing import Optional
 from geopy.distance import geodesic
 from pydantic import BaseModel
@@ -184,6 +184,14 @@ def register_donor(donor: DonorCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Valid 10-digit WhatsApp number required")
     if donor.age < 18 or donor.age > 65:
         raise HTTPException(status_code=400, detail="Donor must be between 18 and 65 years old")
+
+    existing_phone = db.query(Donor).filter(Donor.phone == donor.phone).first()
+    if existing_phone:
+        raise HTTPException(status_code=400, detail="Account already exists. Please login.")
+
+    existing_patient = db.query(Patient).filter(Patient.phone == donor.phone).first()
+    if existing_patient:
+        raise HTTPException(status_code=400, detail="Account already exists. Please login.")
 
     role = "Bridge Donor" if donor.willing_bridge_donor else "Guest"
     base_score = 15.0

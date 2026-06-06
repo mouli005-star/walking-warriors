@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 import { auth } from '../services/api'
 
@@ -51,7 +52,7 @@ export default function Login() {
             BloodBridge
           </h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: 14 }}>
-            NGO Intelligence Platform — Blood Warriors
+            Every drop counts. Every life matters.
           </p>
         </div>
 
@@ -103,6 +104,25 @@ export default function Login() {
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
+        </div>
+
+        <p style={{
+          textAlign: 'center', color: 'var(--text-secondary)',
+          fontSize: 13, marginTop: 18
+        }}>
+          Want to join as a donor, patient or volunteer?
+        </p>
+
+        <div style={{ textAlign: 'center', marginTop: 10 }}>
+          <Link to="/register" className="btn-primary" style={{ display: 'inline-block' }}>
+            Register with Blood Warriors
+          </Link>
+        </div>
+
+        <div style={{ textAlign: 'center', marginTop: 10 }}>
+          <Link to="/user-login" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: 13, fontWeight: 600 }}>
+            Donor / Patient Login →
+          </Link>
         </div>
 
         <p style={{

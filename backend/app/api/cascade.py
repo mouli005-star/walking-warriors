@@ -1,4 +1,6 @@
+import base64
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi import UploadFile, File
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from app.core.database import get_db
@@ -10,7 +12,7 @@ from app.services.cascade_engine import trigger_cascade, advance_cascade
 from app.services.ai_engine import (
     parse_donor_intent, answer_ngo_question,
     convert_result_to_answer, donor_patient_chat,
-    call_bedrock
+    call_bedrock, get_bedrock_client
 )
 from app.api.auth import get_current_admin
 from pydantic import BaseModel
@@ -250,6 +252,62 @@ Return ONLY a JSON array of 3 strings, nothing else:
         "row_count": len(rows),
         "suggestions": suggestions
     }
+
+@router.post("/ai/ocr-extract")
+async def ocr_extract(file: UploadFile = File(...)):
+    """
+    Upload a hospital document/prescription image.
+    Bedrock Vision extracts patient details and pre-fills registration form.
+    """
+    contents = await file.read()
+    image_b64 = base64.b64encode(contents).decode()
+
+    prompt = """Extract patient registration details from this hospital document.
+Return ONLY this JSON, nothing else:
+{
+  "name": "patient name or null",
+  "age": number or null,
+  "blood_group": "blood group or null",
+  "hospital_name": "hospital name or null",
+  "doctor_name": "doctor name or null",
+  "diagnosis": "diagnosis text or null",
+  "recommended_transfusion_frequency": number or null
+}
+If a field is not visible, use null."""
+
+    try:
+        client = get_bedrock_client()
+        body = {
+            "anthropic_version": "bedrock-2023-05-31",
+            "max_tokens": 500,
+            "messages": [{
+                "role": "user",
+                "content": [
+                    {
+                        "type": "image",
+                        "source": {
+                            "type": "base64",
+                            "media_type": file.content_type or "image/jpeg",
+                            "data": image_b64
+                        }
+                    },
+                    {"type": "text", "text": prompt}
+                ]
+            }]
+        }
+        response = client.invoke_model(
+            modelId="us.anthropic.claude-haiku-4-5-20251001-v1:0",
+            body=json.dumps(body),
+            contentType="application/json",
+            accept="application/json"
+        )
+        result = json.loads(response["body"].read())
+        text = result["content"][0]["text"].strip()
+        text = text.replace("```json", "").replace("```", "").strip()
+        extracted = json.loads(text)
+        return {"success": True, "extracted": extracted}
+    except Exception as e:
+        return {"success": False, "error": str(e), "extracted": {}}
 
 # ── DONOR/PATIENT CONVERSATIONAL AI ──────────────────────────────────────
 @router.post("/ai/chat")

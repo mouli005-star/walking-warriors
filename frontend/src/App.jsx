@@ -10,6 +10,9 @@ import Cascades from './pages/Cascades'
 import ScarcityMap from './pages/ScarcityMap'
 import AIChat from './pages/AIChat'
 import AuditLog from './pages/AuditLog'
+import PatientPortal from './pages/PatientPortal'
+import UserLogin from './pages/UserLogin'
+import DonorPortal from './pages/DonorPortal'
 
 function PrivateLayout({ children }) {
   const token = localStorage.getItem('bb_token')
@@ -17,17 +20,17 @@ function PrivateLayout({ children }) {
 
   if (!token) return <Navigate to="/login" replace/>
 
-  const width = collapsed ? 64 : 240
+  const W = collapsed ? 64 : 240
 
   return (
     <div style={{ display: 'flex' }}>
       <Sidebar collapsed={collapsed} onToggle={() => setCollapsed(value => !value)}/>
       <main style={{
-        marginLeft: width,
+        marginLeft: W,
         flex: 1,
         padding: '28px 32px',
         minHeight: '100vh',
-        maxWidth: `calc(100vw - ${width}px)`,
+        maxWidth: `calc(100vw - ${W}px)`,
         transition: 'margin-left 0.2s ease, max-width 0.2s ease'
       }}>
         {children}
@@ -42,6 +45,7 @@ export default function App() {
       <Routes>
         <Route path="/login" element={<Login/>}/>
         <Route path="/register" element={<Register/>}/>
+        <Route path="/user-login" element={<UserLogin/>}/>
         <Route path="/dashboard" element={
           <PrivateLayout><Overview/></PrivateLayout>
         }/>
@@ -66,6 +70,9 @@ export default function App() {
         <Route path="/dashboard/audit-log" element={
           <PrivateLayout><AuditLog/></PrivateLayout>
         }/>
+        <Route path="/patient" element={<PatientPortal/>}/>
+        <Route path="/patient/:patientId" element={<PatientPortal/>}/>
+        <Route path="/donor-portal/:donorId" element={<DonorPortal/>}/>
         <Route path="/" element={<Navigate to="/login" replace/>}/>
         <Route path="*" element={<Navigate to="/dashboard" replace/>}/>
       </Routes>

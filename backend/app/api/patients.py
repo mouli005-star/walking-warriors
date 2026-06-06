@@ -132,6 +132,14 @@ def register_patient(patient: PatientCreate, db: Session = Depends(get_db)):
     if not patient.phone.isdigit() or len(patient.phone) != 10:
         raise HTTPException(status_code=400, detail="Valid 10-digit WhatsApp number required")
 
+    existing_phone = db.query(Patient).filter(Patient.phone == patient.phone).first()
+    if existing_phone:
+        raise HTTPException(status_code=400, detail="Account already exists. Please login.")
+
+    existing_donor = db.query(Donor).filter(Donor.phone == patient.phone).first()
+    if existing_donor:
+        raise HTTPException(status_code=400, detail="Account already exists. Please login.")
+
     next_transfusion = patient.expected_next_transfusion_date
     if not next_transfusion and patient.last_transfusion_date:
         from datetime import timedelta
