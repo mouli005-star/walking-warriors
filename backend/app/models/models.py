@@ -51,6 +51,11 @@ class Patient(Base):
     __tablename__ = "patients"
 
     id                           = Column(String, primary_key=True)  # patient_uuid from CSV
+    name                         = Column(String, nullable=True)
+    guardian_name                = Column(String, nullable=True)
+    phone                        = Column(String, nullable=True)   # Guardian WhatsApp
+    age                          = Column(Integer, nullable=True)
+    hospital_name                = Column(String, nullable=True)
     blood_group                  = Column(String, nullable=True)
     required_blood_group         = Column(String, nullable=True)
     gender                       = Column(String, nullable=True)
@@ -77,6 +82,9 @@ class Donor(Base):
     __tablename__ = "donors"
 
     id                     = Column(String, primary_key=True)  # donor_uuid from CSV
+    name                   = Column(String, nullable=True)
+    phone                  = Column(String, nullable=True)   # WhatsApp number
+    age                    = Column(Integer, nullable=True)
     role                   = Column(String, nullable=False)    # Bridge Donor / Emergency Donor / Guest
     blood_group            = Column(String, nullable=True)
     gender                 = Column(String, nullable=True)
@@ -186,3 +194,14 @@ class CityScarcity(Base):
     coverage_ratio       = Column(Float, default=0.0)  # eligible/scheduled
     warning_level        = Column(String, default="OK")  # OK / WARNING / CRITICAL
     computed_at          = Column(DateTime, server_default=func.now())
+
+
+class NGOAdmin(Base):
+    __tablename__ = "ngo_admins"
+
+    id            = Column(Integer, primary_key=True, autoincrement=True)
+    name          = Column(String, nullable=False)
+    email         = Column(String, unique=True, nullable=False)
+    password_hash = Column(String, nullable=False)
+    role          = Column(String, default="admin")
+    created_at    = Column(DateTime, server_default=func.now())
