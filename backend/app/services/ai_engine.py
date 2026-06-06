@@ -144,7 +144,8 @@ Database result: {json.dumps(db_result[:10], default=str)}
 
 Give a clear answer in 1-2 sentences. Be specific with numbers.
 If empty result, say what information is unavailable.
-Never mention SQL or technical terms."""
+Never mention SQL or technical terms.
+IMPORTANT: Reply in plain text only. No markdown, no asterisks, no bold, no bullet points."""
 
     try:
         return call_bedrock(prompt, max_tokens=200)

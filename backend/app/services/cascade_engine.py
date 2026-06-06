@@ -239,10 +239,12 @@ def run_stage_backup_pool(cascade: CascadeRun, patient: Patient, db: Session) ->
         send_whatsapp_message(donor.phone or "0000000000", message, donor.id)
         contacted += 1
 
+    from_stage = cascade.current_stage
     cascade.current_stage = "BACKUP_POOL"
     db.commit()
 
     log_event(db, "STAGE_BACKUP_POOL_STARTED", "cascade_run", cascade.id, {
+        "from_stage": from_stage,
         "donors_contacted": contacted
     })
     return {"contacted": contacted}
@@ -293,10 +295,12 @@ def run_stage_expanded(cascade: CascadeRun, patient: Patient, db: Session) -> di
         send_whatsapp_message(donor.phone or "0000000000", message, donor.id)
         contacted += 1
 
+    from_stage = cascade.current_stage
     cascade.current_stage = "EXPANDED"
     db.commit()
 
     log_event(db, "STAGE_EXPANDED_STARTED", "cascade_run", cascade.id, {
+        "from_stage": from_stage,
         "donors_contacted": contacted
     })
     return {"contacted": contacted}
@@ -311,8 +315,13 @@ def run_stage_blood_bank(cascade: CascadeRun, patient: Patient, db: Session) -> 
     log_event(db, "STAGE_BLOOD_BANK_STARTED", "cascade_run", cascade.id, {
         "message": message
     })
+    from_stage = cascade.current_stage
     cascade.current_stage = "BLOOD_BANK"
     db.commit()
+    log_event(db, "STAGE_BLOOD_BANK_STAGE_SET", "cascade_run", cascade.id, {
+        "from_stage": from_stage,
+        "to_stage": "BLOOD_BANK"
+    })
     return {"contacted": 0}
 
 # ── STAGE 5: NGO ALERT ───────────────────────────────────────────────────
@@ -325,8 +334,13 @@ def run_stage_ngo_alert(cascade: CascadeRun, patient: Patient, db: Session) -> d
     log_event(db, "STAGE_NGO_ALERT_STARTED", "cascade_run", cascade.id, {
         "message": message
     })
+    from_stage = cascade.current_stage
     cascade.current_stage = "NGO_ALERT"
     db.commit()
+    log_event(db, "STAGE_NGO_ALERT_STAGE_SET", "cascade_run", cascade.id, {
+        "from_stage": from_stage,
+        "to_stage": "NGO_ALERT"
+    })
     return {"alerted": True}
 
 # ── ADVANCE CASCADE ──────────────────────────────────────────────────────
@@ -373,16 +387,50 @@ def advance_cascade(cascade_id: int, db: Session) -> dict:
         "context":  cascade_context
     })
 
-    if decision["action"] == "ADVANCE_STAGE":
-        stage_map = {
-            "BLOOD_FAMILY": "BACKUP_POOL",
-            "BACKUP_POOL":  "EXPANDED",
-            "EXPANDED":     "BLOOD_BANK",
-            "BLOOD_BANK":   "NGO_ALERT"
-        }
-        next_stage = stage_map.get(cascade.current_stage, "NGO_ALERT")
+    stage_map = {
+        "BLOOD_FAMILY": "BACKUP_POOL",
+        "BACKUP_POOL":  "EXPANDED",
+        "EXPANDED":     "BLOOD_BANK",
+        "BLOOD_BANK":   "NGO_ALERT"
+    }
+
+    current_stage_contacts = [c for c in contacts if c.stage == cascade.current_stage]
+    all_non_responsive = all(
+        c.response in ["NO_REPLY", "DECLINED"]
+        for c in current_stage_contacts
+    ) if current_stage_contacts else True
+    urgent = days_until <= 2
+
+    action = decision.get("action")
+    if action == "MARK_FULFILLED":
+        cascade.status       = "FULFILLED"
+        cascade.fulfilled_at = datetime.now()
+        db.commit()
+        return {"cascade_id": cascade_id, "action": "MARK_FULFILLED", "status": "FULFILLED"}
+
+    if action == "ADVANCE_STAGE":
+        should_advance = True
+    else:
+        should_advance = all_non_responsive or urgent
+
+    if should_advance:
+        from_stage = cascade.current_stage
+        next_stage = stage_map.get(from_stage, "NGO_ALERT")
+        reason = (
+            "AI_DECISION_ADVANCE" if action == "ADVANCE_STAGE" else
+            "FORCED_ADVANCE_NON_RESPONSIVE" if all_non_responsive else
+            "FORCED_ADVANCE_URGENT"
+        )
+
         cascade.current_stage = next_stage
         db.commit()
+
+        log_event(db, "CASCADE_STAGE_ADVANCED", "cascade_run", cascade_id, {
+            "from_stage": from_stage,
+            "to_stage": next_stage,
+            "reason": reason,
+            "ai_action": action
+        })
 
         if next_stage == "BACKUP_POOL":
             run_stage_backup_pool(cascade, patient, db)
@@ -393,26 +441,9 @@ def advance_cascade(cascade_id: int, db: Session) -> dict:
         elif next_stage == "NGO_ALERT":
             run_stage_ngo_alert(cascade, patient, db)
 
-    elif decision["action"] == "MARK_FULFILLED":
-        cascade.status       = "FULFILLED"
-        cascade.fulfilled_at = datetime.now()
-        db.commit()
+        return {"cascade_id": cascade_id, "action": "ADVANCE_STAGE", "to": next_stage, "reason": reason}
 
-    elif decision["action"] == "ALERT_ADMIN":
-        cascade.current_stage = "NGO_ALERT"
-        db.commit()
-        log_event(db, "NGO_ALERT_TRIGGERED", "cascade_run", cascade_id, {
-            "reason":    decision.get("reason"),
-            "urgency":   decision.get("urgency"),
-            "days_left": days_until
-        })
-
-    return {
-        "cascade_id": cascade_id,
-        "ai_decision": decision,
-        "new_stage":   cascade.current_stage,
-        "status":      cascade.status
-    }
+    return {"cascade_id": cascade_id, "action": "WAIT", "reason": "Still waiting for donor responses"}
 
 
 def trigger_cascade(patient_id: str, transfusion_date: datetime, db: Session) -> dict:

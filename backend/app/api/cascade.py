@@ -9,7 +9,8 @@ from app.models.models import (
 from app.services.cascade_engine import trigger_cascade, advance_cascade
 from app.services.ai_engine import (
     parse_donor_intent, answer_ngo_question,
-    convert_result_to_answer, donor_patient_chat
+    convert_result_to_answer, donor_patient_chat,
+    call_bedrock
 )
 from app.api.auth import get_current_admin
 from pydantic import BaseModel
@@ -207,8 +208,9 @@ def ngo_analytics_chat(
         if not generated_sql.strip().upper().startswith("SELECT"):
             return {
                 "question": req.question,
-                "answer":   "I can only answer questions that read data, not modify it.",
-                "sql":      generated_sql
+                "answer": "I can only answer questions that read data.",
+                "sql": generated_sql,
+                "suggestions": []
             }
 
         result = db.execute(text(generated_sql))
@@ -220,12 +222,33 @@ def ngo_analytics_chat(
 
     answer = convert_result_to_answer(req.question, generated_sql, rows)
 
+    # Generate dynamic follow-up suggestions
+    followup_prompt = f"""Based on this question and answer about Blood Warriors NGO data:
+Question: {req.question}
+Answer: {answer}
+
+Generate 3 short follow-up questions the admin might want to ask next.
+Return ONLY a JSON array of 3 strings, nothing else:
+["question 1", "question 2", "question 3"]"""
+
+    try:
+        raw = call_bedrock(followup_prompt, max_tokens=200)
+        raw = raw.replace("```json", "").replace("```", "").strip()
+        suggestions = json.loads(raw)
+    except Exception:
+        suggestions = [
+            "Which city has the most critical shortage?",
+            "Show me donors eligible to donate this week",
+            "How many cascades were fulfilled last month?"
+        ]
+
     return {
-        "question":    req.question,
-        "answer":      answer,
-        "data":        rows[:20],
-        "sql_used":    generated_sql,
-        "row_count":   len(rows)
+        "question":  req.question,
+        "answer":    answer,
+        "data":      rows[:20],
+        "sql_used":  generated_sql,
+        "row_count": len(rows),
+        "suggestions": suggestions
     }
 
 # ── DONOR/PATIENT CONVERSATIONAL AI ──────────────────────────────────────
