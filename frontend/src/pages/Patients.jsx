@@ -118,8 +118,8 @@ export default function Patients() {
                           <div style={{
                             width: 28, height: 28, borderRadius: '50%',
                             background: urgent
-                              ? 'rgba(244,63,94,0.15)'
-                              : 'rgba(96,165,250,0.15)',
+                              ? 'var(--red-soft)'
+                              : 'var(--blue-soft)',
                             display: 'flex', alignItems: 'center', justifyContent: 'center'
                           }}>
                             <Heart size={12} color={urgent ? 'var(--red)' : 'var(--blue)'}/>

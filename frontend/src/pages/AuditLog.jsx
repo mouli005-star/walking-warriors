@@ -6,8 +6,8 @@ const EVENT_COLORS = {
   CASCADE_TRIGGERED:        'var(--orange)',
   STAGE_BLOOD_FAMILY_STARTED:'var(--green)',
   STAGE_BACKUP_POOL_STARTED: 'var(--blue)',
-  DONOR_REPLIED:            'var(--purple)',
-  AI_CASCADE_DECISION:      'var(--accent2)',
+  DONOR_REPLIED:            'var(--text-secondary)',
+  AI_CASCADE_DECISION:      'var(--orange)',
   NGO_ALERT_TRIGGERED:      'var(--red)',
   PATIENT_REGISTERED:       'var(--blue)',
   DONOR_REGISTERED:         'var(--green)',
@@ -131,7 +131,7 @@ export default function AuditLog() {
                       {Object.entries(log.payload).map(([k, v]) => (
                         <div key={k} style={{ display: 'flex', gap: 6, fontSize: 12 }}>
                           <span style={{ color: 'var(--text-muted)', minWidth: 100 }}>{k.replace(/_/g, ' ')}:</span>
-                          <span>{String(v)}</span>
+                          <span>{typeof v === 'object' ? JSON.stringify(v) : String(v)}</span>
                         </div>
                       ))}
                     </div>

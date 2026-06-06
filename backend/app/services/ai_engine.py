@@ -54,7 +54,9 @@ PostgreSQL database for Blood Warriors NGO India.
 
 patients(id, name, blood_group, required_blood_group, latitude, longitude,
          expected_next_transfusion_date, frequency_in_days, quantity_required,
-         hospital_name, city_cluster, status, phone, guardian_name, age)
+      hospital_name, city_cluster, status, phone, guardian_name, age)
+      NOTE: expected_next_transfusion_date may contain historical dates from 2024-2025.
+      To find patients needing transfusions soon, query ALL patients and their frequency.
 
 donors(id, name, role, blood_group, latitude, longitude, base_rfmt_score,
        churn_risk, eligibility_status, active_status, donations_till_date,

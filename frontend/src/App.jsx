@@ -1,26 +1,34 @@
-import { lazy, Suspense } from 'react'
+import { useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Sidebar from './components/Sidebar'
-
-const Login = lazy(() => import('./pages/Login'))
-const Overview = lazy(() => import('./pages/Overview'))
-const Patients = lazy(() => import('./pages/Patients'))
-const Donors = lazy(() => import('./pages/Donors'))
-const Cascades = lazy(() => import('./pages/Cascades'))
-const ScarcityMap = lazy(() => import('./pages/ScarcityMap'))
-const AIChat = lazy(() => import('./pages/AIChat'))
-const AuditLog = lazy(() => import('./pages/AuditLog'))
+import Login from './pages/Login'
+import Register from './pages/Register'
+import Overview from './pages/Overview'
+import Patients from './pages/Patients'
+import Donors from './pages/Donors'
+import Cascades from './pages/Cascades'
+import ScarcityMap from './pages/ScarcityMap'
+import AIChat from './pages/AIChat'
+import AuditLog from './pages/AuditLog'
 
 function PrivateLayout({ children }) {
   const token = localStorage.getItem('bb_token')
+  const [collapsed, setCollapsed] = useState(false)
+
   if (!token) return <Navigate to="/login" replace/>
+
+  const width = collapsed ? 64 : 240
+
   return (
     <div style={{ display: 'flex' }}>
-      <Sidebar/>
+      <Sidebar collapsed={collapsed} onToggle={() => setCollapsed(value => !value)}/>
       <main style={{
-        marginLeft: 240, flex: 1,
+        marginLeft: width,
+        flex: 1,
         padding: '28px 32px',
-        minHeight: '100vh'
+        minHeight: '100vh',
+        maxWidth: `calc(100vw - ${width}px)`,
+        transition: 'margin-left 0.2s ease, max-width 0.2s ease'
       }}>
         {children}
       </main>
@@ -31,34 +39,36 @@ function PrivateLayout({ children }) {
 export default function App() {
   return (
     <BrowserRouter>
-      <Suspense fallback={<div>Loading...</div>}>
-        <Routes>
-          <Route path="/login" element={<Login/>}/>
-          <Route path="/dashboard" element={
-            <PrivateLayout><Overview/></PrivateLayout>
-          }/>
-          <Route path="/dashboard/patients" element={
-            <PrivateLayout><Patients/></PrivateLayout>
-          }/>
-          <Route path="/dashboard/donors" element={
-            <PrivateLayout><Donors/></PrivateLayout>
-          }/>
-          <Route path="/dashboard/cascades" element={
-            <PrivateLayout><Cascades/></PrivateLayout>
-          }/>
-          <Route path="/dashboard/scarcity" element={
-            <PrivateLayout><ScarcityMap/></PrivateLayout>
-          }/>
-          <Route path="/dashboard/ai-chat" element={
-            <PrivateLayout><AIChat/></PrivateLayout>
-          }/>
-          <Route path="/dashboard/audit-log" element={
-            <PrivateLayout><AuditLog/></PrivateLayout>
-          }/>
-          <Route path="/" element={<Navigate to="/login" replace/>}/>
-          <Route path="*" element={<Navigate to="/dashboard" replace/>}/>
-        </Routes>
-      </Suspense>
+      <Routes>
+        <Route path="/login" element={<Login/>}/>
+        <Route path="/register" element={<Register/>}/>
+        <Route path="/dashboard" element={
+          <PrivateLayout><Overview/></PrivateLayout>
+        }/>
+        <Route path="/dashboard/patients" element={
+          <PrivateLayout><Patients/></PrivateLayout>
+        }/>
+        <Route path="/dashboard/donors" element={
+          <PrivateLayout><Donors/></PrivateLayout>
+        }/>
+        <Route path="/dashboard/cascades" element={
+          <PrivateLayout><Cascades/></PrivateLayout>
+        }/>
+        <Route path="/dashboard/scarcity" element={
+          <PrivateLayout><ScarcityMap/></PrivateLayout>
+        }/>
+        <Route path="/dashboard/ai-chat" element={
+          <PrivateLayout><AIChat/></PrivateLayout>
+        }/>
+        <Route path="/dashboard/audit" element={
+          <PrivateLayout><AuditLog/></PrivateLayout>
+        }/>
+        <Route path="/dashboard/audit-log" element={
+          <PrivateLayout><AuditLog/></PrivateLayout>
+        }/>
+        <Route path="/" element={<Navigate to="/login" replace/>}/>
+        <Route path="*" element={<Navigate to="/dashboard" replace/>}/>
+      </Routes>
     </BrowserRouter>
   )
 }

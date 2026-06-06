@@ -13,7 +13,7 @@ const STAGE_LABELS = {
 const STAGE_COLORS = {
   BLOOD_FAMILY: 'var(--green)',
   BACKUP_POOL:  'var(--blue)',
-  EXPANDED:     'var(--purple)',
+  EXPANDED:     'var(--orange)',
   BLOOD_BANK:   'var(--orange)',
   NGO_ALERT:    'var(--red)'
 }
@@ -135,7 +135,7 @@ export default function Cascades() {
               borderRadius: 10, flex: 1
             }}>
               <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>LANGUAGE</div>
-              <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--purple)' }}>
+              <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-secondary)' }}>
                 {parsedIntent.language_detected}
               </div>
             </div>

@@ -179,7 +179,7 @@ export default function AIChat() {
         }}>
           <div style={{
             width: 32, height: 32, borderRadius: 8,
-            background: 'linear-gradient(135deg, var(--accent), var(--accent2))',
+            background: 'var(--accent)',
             display: 'flex', alignItems: 'center', justifyContent: 'center'
           }}>
             <Bot size={16} color="white"/>
@@ -203,9 +203,7 @@ export default function AIChat() {
             }}>
               <div style={{
                 width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
-                background: msg.role === 'user'
-                  ? 'linear-gradient(135deg, var(--accent), var(--purple))'
-                  : 'var(--bg-card)',
+                background: msg.role === 'user' ? 'var(--accent)' : 'var(--bg-card)',
                 border: '1px solid var(--border)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center'
               }}>
@@ -218,7 +216,7 @@ export default function AIChat() {
               <div style={{ maxWidth: '72%' }}>
                 <div style={{
                   background: msg.role === 'user'
-                    ? 'linear-gradient(135deg, var(--accent), var(--purple))'
+                    ? 'var(--accent)'
                     : 'var(--bg-card)',
                   border: msg.role === 'user' ? 'none' : '1px solid var(--border)',
                   borderRadius: msg.role === 'user' ? '12px 4px 12px 12px' : '4px 12px 12px 12px',
@@ -242,7 +240,7 @@ export default function AIChat() {
                       fontSize: 11, color: 'var(--text-muted)'
                     }}>
                       <Database size={10}/>
-                      {msg.count} row{msg.count !== 1 ? 's' : ''} from database
+                      <span>{msg.count} row{msg.count !== 1 ? 's' : ''} from database</span>
                     </div>
                     <div style={{ overflowX: 'auto', maxHeight: 180 }}>
                       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
@@ -376,8 +374,7 @@ export default function AIChat() {
                 width: 34, height: 34, borderRadius: 8, flexShrink: 0,
                 background: input.trim() && !loading ? 'var(--accent)' : 'var(--border)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                transition: 'all 0.15s',
-                boxShadow: input.trim() ? '0 0 12px rgba(244,63,94,0.3)' : 'none'
+                transition: 'background 0.15s'
               }}>
               <Send size={14} color="white"/>
             </button>

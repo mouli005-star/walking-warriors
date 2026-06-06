@@ -14,24 +14,24 @@ const CLUSTER_COORDS = [
   [11.0168, 76.9558], // Coimbatore
 ]
 
-const COLORS = { CRITICAL: '#ef4444', WARNING: '#f97316', OK: '#22c55e' }
+const COLORS = { CRITICAL: 'var(--red)', WARNING: 'var(--orange)', OK: 'var(--green)' }
 
 function LegendControl() {
   return (
     <div style={{
       position: 'absolute', bottom: 30, right: 10,
-      background: 'rgba(17,24,39,0.95)',
-      border: '1px solid #2a3650',
+      background: 'var(--bg-card)',
+      border: '1px solid var(--border)',
       borderRadius: 10, padding: '12px 16px',
       zIndex: 1000, minWidth: 140
     }}>
-      <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8',
+      <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)',
         textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10
       }}>Blood Supply</div>
       {[
-        { color: '#ef4444', label: 'Critical shortage' },
-        { color: '#f97316', label: 'Warning level'    },
-        { color: '#22c55e', label: 'Adequate supply'  },
+        { color: 'var(--red)', label: 'Critical shortage' },
+        { color: 'var(--orange)', label: 'Warning level'    },
+        { color: 'var(--green)', label: 'Adequate supply'  },
       ].map(({ color, label }) => (
         <div key={label} style={{
           display: 'flex', alignItems: 'center',
@@ -40,7 +40,7 @@ function LegendControl() {
           <div style={{
             width: 12, height: 12, borderRadius: '50%', background: color
           }}/>
-          <span style={{ fontSize: 12, color: '#e2e8f0' }}>{label}</span>
+          <span style={{ fontSize: 12, color: 'var(--text-primary)' }}>{label}</span>
         </div>
       ))}
     </div>
@@ -98,9 +98,9 @@ export default function ScarcityMap() {
           gap: 12, marginBottom: 20
         }}>
           {[
-            { label: 'Critical Zones', value: scarcity.summary.critical_zones, color: '#ef4444', bg: '#7f1d1d' },
-            { label: 'Warning Zones',  value: scarcity.summary.warning_zones,  color: '#f97316', bg: '#7c2d12' },
-            { label: 'OK Zones',       value: scarcity.summary.ok_zones,       color: '#22c55e', bg: '#14532d' },
+            { label: 'Critical Zones', value: scarcity.summary.critical_zones, color: 'var(--red)', bg: 'var(--red-soft)' },
+            { label: 'Warning Zones',  value: scarcity.summary.warning_zones,  color: 'var(--orange)', bg: 'var(--orange-soft)' },
+            { label: 'OK Zones',       value: scarcity.summary.ok_zones,       color: 'var(--green)', bg: 'var(--green-soft)' },
           ].map(({ label, value, color, bg }) => (
             <div key={label} className="card" style={{
               display: 'flex', alignItems: 'center', gap: 16
@@ -128,7 +128,7 @@ export default function ScarcityMap() {
         <div style={{ position: 'relative', height: 480 }}>
           <MapContainer
             center={[17.0, 79.0]} zoom={6}
-            style={{ height: '100%', width: '100%', background: '#0a0e1a' }}
+            style={{ height: '100%', width: '100%', background: 'var(--bg-primary)' }}
           >
             <TileLayer
               url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
@@ -138,7 +138,7 @@ export default function ScarcityMap() {
               const cluster = clusterMap[i]
               const color   = cluster
                 ? COLORS[cluster.worst]
-                : '#22c55e'
+                : 'var(--green)'
               const radius  = cluster?.worst === 'CRITICAL' ? 28
                             : cluster?.worst === 'WARNING'  ? 22
                             : 16
@@ -158,7 +158,7 @@ export default function ScarcityMap() {
                 >
                   <Popup>
                     <div style={{
-                      background: '#1a2235', color: '#f1f5f9',
+                      background: 'var(--bg-card)', color: 'var(--text-primary)',
                       padding: 12, borderRadius: 8, minWidth: 200
                     }}>
                       <div style={{ fontWeight: 700, marginBottom: 8 }}>
@@ -176,7 +176,7 @@ export default function ScarcityMap() {
                         </div>
                       ))}
                       {!cluster && (
-                        <div style={{ color: '#22c55e', fontSize: 12 }}>
+                        <div style={{ color: 'var(--green)', fontSize: 12 }}>
                           Supply adequate
                         </div>
                       )}
@@ -213,7 +213,7 @@ export default function ScarcityMap() {
                 <tr key={i} style={{ borderBottom: '1px solid var(--border)' }}>
                   <td style={{ padding: '10px 12px', fontSize: 13 }}>Zone {z.city_cluster}</td>
                   <td style={{ padding: '10px 12px', fontSize: 13 }}>{z.blood_group}</td>
-                  <td style={{ padding: '10px 12px', fontSize: 13, color: '#ef4444', fontWeight: 600 }}>
+                  <td style={{ padding: '10px 12px', fontSize: 13, color: 'var(--red)', fontWeight: 600 }}>
                     {z.eligible_donors}
                   </td>
                   <td style={{ padding: '10px 12px' }}>

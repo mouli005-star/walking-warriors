@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
+import random
 import json
 
 router  = APIRouter(prefix="/auth", tags=["auth"])
@@ -23,6 +24,56 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 class LoginRequest(BaseModel):
     email:    str
     password: str
+
+
+@router.post("/send-otp")
+def send_otp(request: dict, db: Session = Depends(get_db)):
+    phone = request.get("phone", "")
+    if not phone or len(phone) != 10:
+        raise HTTPException(status_code=400, detail="Invalid phone number")
+
+    otp = str(random.randint(100000, 999999))
+
+    # Store in event_log temporarily (mock — on AWS use DynamoDB with TTL)
+    db.add(EventLog(
+        event_type  = "OTP_SENT",
+        entity_type = "phone",
+        entity_id   = phone,
+        payload     = json.dumps({"otp": otp, "expires_in": "5 minutes"})
+    ))
+    db.commit()
+
+    # On AWS: boto3 SNS publish SMS
+    # Locally: return OTP in response for demo
+    print(f"[OTP for {phone}]: {otp}")
+
+    return {
+        "success": True,
+        "mock":    True,
+        "otp":     otp,  # Remove this in production
+        "message": f"OTP sent to +91{phone}"
+    }
+
+
+@router.post("/verify-otp")
+def verify_otp(request: dict, db: Session = Depends(get_db)):
+    phone = request.get("phone", "")
+    otp   = request.get("otp",   "")
+
+    # Get latest OTP for this phone
+    log = db.query(EventLog).filter(
+        EventLog.event_type  == "OTP_SENT",
+        EventLog.entity_id   == phone
+    ).order_by(EventLog.created_at.desc()).first()
+
+    if not log:
+        raise HTTPException(status_code=400, detail="No OTP found. Request a new one.")
+
+    payload = json.loads(log.payload)
+    if payload.get("otp") != otp:
+        raise HTTPException(status_code=400, detail="Invalid OTP")
+
+    return {"verified": True, "phone": phone}
 
 # ── HELPERS ─────────────────────────────────────────────────────────────
 def verify_password(plain, hashed):

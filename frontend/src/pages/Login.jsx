@@ -34,14 +34,14 @@ export default function Login() {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      background: 'linear-gradient(135deg, #0a0e1a 0%, #1a0a1a 100%)'
+      background: 'var(--bg-primary)'
     }}>
       <div style={{ width: 420 }}>
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
           <div style={{
             width: 64, height: 64,
-            background: 'linear-gradient(135deg, #e11d48, #9333ea)',
+            background: 'var(--accent)',
             borderRadius: 16,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             margin: '0 auto 16px',
@@ -89,7 +89,7 @@ export default function Login() {
             </div>
             {error && (
               <div style={{
-                background: 'var(--red-soft)', color: '#fca5a5',
+                background: 'var(--red-soft)', color: 'var(--text-primary)',
                 padding: '10px 14px', borderRadius: 8,
                 fontSize: 13, marginBottom: 16
               }}>{error}</div>

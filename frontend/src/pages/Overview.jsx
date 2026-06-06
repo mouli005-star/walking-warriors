@@ -7,29 +7,23 @@ import { Heart, Users, Zap, AlertTriangle, TrendingUp, Clock } from 'lucide-reac
 import { patients, donors, cascade, dashboard } from '../services/api'
 
 const COLORS = {
-  LOW:    '#22c55e',
-  MEDIUM: '#f97316',
-  HIGH:   '#ef4444',
+  LOW:    'var(--green)',
+  MEDIUM: 'var(--orange)',
+  HIGH:   'var(--red)',
 }
 
-const BG_COLORS = ['#3b82f6','#e11d48','#a855f7','#22c55e','#f97316','#06b6d4','#eab308','#ec4899']
+const BG_COLORS = ['var(--blue)','var(--accent)','var(--green)','var(--orange)','var(--text-muted)','var(--border-light)','var(--text-secondary)','var(--red)']
 
 function MetricCard({ icon: Icon, label, value, sub, color, trend }) {
   return (
     <div className="card" style={{ position: 'relative', overflow: 'hidden' }}>
-      <div style={{
-        position: 'absolute', top: 0, right: 0,
-        width: 80, height: 80,
-        background: `radial-gradient(circle, ${color}22 0%, transparent 70%)`,
-        borderRadius: '0 12px 0 80px'
-      }}/>
       <div style={{
         display: 'flex', alignItems: 'center',
         gap: 10, marginBottom: 16
       }}>
         <div style={{
           width: 36, height: 36, borderRadius: 8,
-          background: `${color}22`,
+          background: 'var(--bg-elevated)',
           display: 'flex', alignItems: 'center', justifyContent: 'center'
         }}>
           <Icon size={18} color={color}/>
@@ -154,8 +148,8 @@ export default function Overview() {
                   borderRadius: 8, fontSize: 13
                 }}
               />
-              <Bar dataKey="donors" fill="#3b82f6" radius={[4,4,0,0]} name="Donors"/>
-              <Bar dataKey="avg_score" fill="#e11d48" radius={[4,4,0,0]} name="Avg RFMT"/>
+              <Bar dataKey="donors" fill="var(--blue)" radius={[4,4,0,0]} name="Donors"/>
+              <Bar dataKey="avg_score" fill="var(--accent)" radius={[4,4,0,0]} name="Avg RFMT"/>
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -212,15 +206,15 @@ export default function Overview() {
               {churn && (
                 <div style={{
                   marginTop: 16, padding: '10px 14px',
-                  background: 'var(--red-soft)', borderRadius: 8
+                  background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 8
                 }}>
-                  <div style={{ fontSize: 11, color: '#fca5a5', fontWeight: 600 }}>
+                  <div style={{ fontSize: 11, color: 'var(--text-secondary)', fontWeight: 600 }}>
                     HIGH RISK
                   </div>
-                  <div style={{ fontSize: 20, fontWeight: 700, color: '#ef4444' }}>
+                  <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--red)' }}>
                     {churn.high_risk_pct}%
                   </div>
-                  <div style={{ fontSize: 11, color: '#fca5a5' }}>
+                  <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
                     of donor pool needs intervention
                   </div>
                 </div>
@@ -302,7 +296,7 @@ export default function Overview() {
       {/* Scarcity Alert Bar */}
       {scarcity?.critical?.length > 0 && (
         <div style={{
-          background: 'var(--red-soft)',
+          background: 'var(--bg-elevated)',
           border: '1px solid var(--red)',
           borderRadius: 12, padding: '16px 20px'
         }}>
@@ -311,18 +305,16 @@ export default function Overview() {
             gap: 8, marginBottom: 12
           }}>
             <AlertTriangle size={16} color="var(--red)"/>
-            <span style={{
-              fontWeight: 600, color: '#fca5a5', fontSize: 14
-            }}>
+            <span style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: 14 }}>
               {scarcity.critical.length} Critical Blood Shortage Zones
             </span>
           </div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {scarcity.critical.slice(0,6).map((z, i) => (
               <span key={i} style={{
-                background: 'rgba(239,68,68,0.2)',
+                background: 'var(--red-soft)',
                 border: '1px solid var(--red)',
-                color: '#fca5a5', borderRadius: 6,
+                color: 'var(--text-primary)', borderRadius: 6,
                 padding: '4px 10px', fontSize: 12
               }}>
                 Zone {z.city_cluster} · {z.blood_group} ({z.eligible_donors} donors)
@@ -340,7 +332,7 @@ const STAGE_COLORS = {
   BLOOD_FAMILY: 'var(--green)',
   BACKUP_POOL:  'var(--blue)',
   EXPANDED:     'var(--orange)',
-  BLOOD_BANK:   'var(--purple)',
+  BLOOD_BANK:   'var(--text-secondary)',
   NGO_ALERT:    'var(--red)'
 }
 

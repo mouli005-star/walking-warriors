@@ -353,7 +353,7 @@ def get_audit_log(
         "entity_type": log.entity_type,
         "entity_id":   log.entity_id,
         "payload":     json.loads(log.payload) if log.payload else {},
-        "created_at":  log.created_at
+        "created_at":  str(log.created_at)
     } for log in logs]
 
 # ── INTENT PARSER TEST ENDPOINT ─────────────────────────────────────────────

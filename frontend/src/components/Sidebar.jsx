@@ -1,23 +1,25 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, Users, Heart, Zap,
-  MapPin, MessageSquare, FileText, LogOut, Activity
+  MapPin, MessageSquare, FileText, LogOut,
+  ChevronLeft, ChevronRight
 } from 'lucide-react'
 
 const links = [
-  { to: '/dashboard',           icon: LayoutDashboard, label: 'Overview'      },
-  { to: '/dashboard/patients',  icon: Heart,           label: 'Patients'      },
-  { to: '/dashboard/donors',    icon: Users,           label: 'Donors'        },
-  { to: '/dashboard/cascades',  icon: Zap,             label: 'Cascades'      },
-  { to: '/dashboard/scarcity',  icon: MapPin,          label: 'Scarcity Map'  },
-  { to: '/dashboard/ai-chat',   icon: MessageSquare,   label: 'AI Analytics'  },
-  { to: '/dashboard/audit',     icon: FileText,        label: 'Audit Log'     },
+  { to: '/dashboard',          icon: LayoutDashboard, label: 'Overview'     },
+  { to: '/dashboard/patients', icon: Heart,           label: 'Patients'     },
+  { to: '/dashboard/donors',   icon: Users,           label: 'Donors'       },
+  { to: '/dashboard/cascades', icon: Zap,             label: 'Cascades'     },
+  { to: '/dashboard/scarcity', icon: MapPin,          label: 'Scarcity Map' },
+  { to: '/dashboard/ai-chat',  icon: MessageSquare,   label: 'AI Analytics' },
+  { to: '/dashboard/audit',    icon: FileText,        label: 'Audit Log'    },
 ]
 
-export default function Sidebar() {
-  const navigate  = useNavigate()
-  const adminRaw  = localStorage.getItem('bb_admin')
-  const admin     = adminRaw ? JSON.parse(adminRaw) : { name: 'Admin' }
+export default function Sidebar({ collapsed, onToggle }) {
+  const navigate = useNavigate()
+  const adminRaw = localStorage.getItem('bb_admin')
+  const admin = adminRaw ? JSON.parse(adminRaw) : { name: 'Admin' }
+  const width = collapsed ? 64 : 240
 
   function logout() {
     localStorage.removeItem('bb_token')
@@ -27,93 +29,148 @@ export default function Sidebar() {
 
   return (
     <aside style={{
-      width: 240, minHeight: '100vh',
-      background: 'var(--bg-secondary)',
-      borderRight: '1px solid var(--border)',
+      width: width, minHeight: '100vh',
+      background: '#111C2D',
+      borderRight: '1px solid #1E2D45',
       display: 'flex', flexDirection: 'column',
-      position: 'fixed', top: 0, left: 0, zIndex: 100
+      position: 'fixed', top: 0, left: 0, zIndex: 100,
+      transition: 'width 0.2s ease',
+      overflow: 'hidden'
     }}>
-      {/* Logo */}
       <div style={{
-        padding: '24px 20px',
-        borderBottom: '1px solid var(--border)',
-        display: 'flex', alignItems: 'center', gap: 10
+        padding: collapsed ? '20px 0' : '20px 16px',
+        borderBottom: '1px solid #1E2D45',
+        display: 'flex', alignItems: 'center',
+        justifyContent: collapsed ? 'center' : 'space-between',
+        gap: 10
       }}>
+        {!collapsed && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{
+              width: 32, height: 32,
+              background: 'linear-gradient(135deg, #C0392B, #922B21)',
+              borderRadius: 8, display: 'flex',
+              alignItems: 'center', justifyContent: 'center', fontSize: 16
+            }}>🩸</div>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: 14, color: '#ECF0F1' }}>
+                BloodBridge
+              </div>
+              <div style={{ fontSize: 10, color: '#5D6D7E' }}>NGO Platform</div>
+            </div>
+          </div>
+        )}
+
+        {collapsed && (
+          <div style={{
+            width: 32, height: 32,
+            background: 'linear-gradient(135deg, #C0392B, #922B21)',
+            borderRadius: 8, display: 'flex',
+            alignItems: 'center', justifyContent: 'center', fontSize: 16
+          }}>🩸</div>
+        )}
+
+        <button
+          onClick={onToggle}
+          style={{
+            background: '#162032', border: '1px solid #1E2D45',
+            borderRadius: 6, width: 24, height: 24,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer', color: '#95A5A6', flexShrink: 0
+          }}>
+          {collapsed ? <ChevronRight size={13}/> : <ChevronLeft size={13}/>}
+        </button>
+      </div>
+
+      {!collapsed && (
         <div style={{
-          width: 36, height: 36,
-          background: 'linear-gradient(135deg, #e11d48, #9333ea)',
-          borderRadius: 8,
-          display: 'flex', alignItems: 'center',
-          justifyContent: 'center', fontSize: 18
-        }}>🩸</div>
-        <div>
-          <div style={{ fontWeight: 700, fontSize: 15 }}>BloodBridge</div>
-          <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>NGO Platform</div>
+          padding: '10px 16px',
+          borderBottom: '1px solid #1E2D45',
+          display: 'flex', alignItems: 'center', gap: 8
+        }}>
+          <div style={{
+            width: 7, height: 7, borderRadius: '50%',
+            background: '#27AE60',
+            animation: 'pulse-dot 2s infinite'
+          }}/>
+          <span style={{ fontSize: 11, color: '#27AE60' }}>System Live</span>
         </div>
-      </div>
+      )}
 
-      {/* Live indicator */}
-      <div style={{
-        padding: '12px 20px',
-        borderBottom: '1px solid var(--border)',
-        display: 'flex', alignItems: 'center', gap: 8
-      }}>
-        <div style={{
-          width: 8, height: 8, borderRadius: '50%',
-          background: 'var(--green)',
-          boxShadow: '0 0 6px var(--green)',
-          animation: 'pulse 2s infinite'
-        }}/>
-        <span style={{ fontSize: 12, color: 'var(--green)' }}>System Live</span>
-      </div>
-
-      {/* Nav */}
-      <nav style={{ flex: 1, padding: '12px 0' }}>
+      <nav style={{ flex: 1, padding: '10px 0' }}>
         {links.map(({ to, icon: Icon, label }) => (
-          <NavLink key={to} to={to} end={to === '/dashboard'}
+          <NavLink
+            key={to}
+            to={to}
+            end={to === '/dashboard'}
             style={({ isActive }) => ({
-              display: 'flex', alignItems: 'center', gap: 10,
-              padding: '10px 20px', textDecoration: 'none',
-              fontSize: 14, fontWeight: 500,
-              color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
-              background: isActive ? 'var(--bg-card)' : 'transparent',
-              borderLeft: isActive ? '2px solid var(--accent)' : '2px solid transparent',
-              transition: 'all 0.15s'
-            })}>
-            <Icon size={16}/>
-            {label}
+              display: 'flex', alignItems: 'center',
+              gap: collapsed ? 0 : 10,
+              padding: collapsed ? '11px 0' : '10px 16px',
+              justifyContent: collapsed ? 'center' : 'flex-start',
+              textDecoration: 'none', fontSize: 13, fontWeight: 500,
+              color: isActive ? '#ECF0F1' : '#95A5A6',
+              background: isActive ? '#162032' : 'transparent',
+              borderLeft: isActive ? '2px solid #C0392B' : '2px solid transparent',
+              transition: 'all 0.15s',
+              position: 'relative'
+            })}
+          >
+            {({ isActive }) => (
+              <>
+                <Icon size={16} color={isActive ? '#C0392B' : '#5D6D7E'}/>
+                {!collapsed && label}
+                {collapsed && (
+                  <div style={{
+                    position: 'absolute', left: 70,
+                    background: '#162032',
+                    border: '1px solid #1E2D45',
+                    borderRadius: 6, padding: '4px 10px',
+                    fontSize: 12, whiteSpace: 'nowrap',
+                    pointerEvents: 'none', opacity: 0,
+                    color: '#ECF0F1', zIndex: 200
+                  }} className="sidebar-tooltip">
+                    {label}
+                  </div>
+                )}
+              </>
+            )}
           </NavLink>
         ))}
       </nav>
 
-      {/* Admin */}
       <div style={{
-        padding: '16px 20px',
-        borderTop: '1px solid var(--border)'
+        padding: collapsed ? '12px 0' : '14px 16px',
+        borderTop: '1px solid #1E2D45',
+        display: 'flex', flexDirection: 'column',
+        alignItems: collapsed ? 'center' : 'flex-start'
       }}>
-        <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>
-          {admin.name}
-        </div>
-        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 12 }}>
-          NGO Administrator
-        </div>
+        {!collapsed && (
+          <>
+            <div style={{ fontSize: 12, fontWeight: 600, color: '#ECF0F1', marginBottom: 2 }}>
+              {admin.name}
+            </div>
+            <div style={{ fontSize: 10, color: '#5D6D7E', marginBottom: 10 }}>
+              NGO Administrator
+            </div>
+          </>
+        )}
         <button
           onClick={logout}
           style={{
-            display: 'flex', alignItems: 'center', gap: 8,
-            background: 'none', color: 'var(--text-secondary)',
-            fontSize: 13, padding: 0, border: 'none'
+            display: 'flex', alignItems: 'center',
+            gap: collapsed ? 0 : 7,
+            background: 'none', color: '#5D6D7E',
+            fontSize: 12, padding: collapsed ? '6px' : '6px 0',
+            border: 'none', cursor: 'pointer',
+            justifyContent: 'center'
           }}>
-          <LogOut size={14}/> Sign out
+          <LogOut size={14}/>
+          {!collapsed && 'Sign out'}
         </button>
       </div>
 
-      <style>{`
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.5; }
-        }
-      `}</style>
+      <style>{`\n        @keyframes pulse-dot {\n          0%, 100% { opacity: 1; }\n          50% { opacity: 0.4; }\n        }\n        nav a:hover .sidebar-tooltip {\n          opacity: 1 !important;\n        }\n      `}</style>
     </aside>
   )
 }
