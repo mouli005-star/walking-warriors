@@ -1,0 +1,74 @@
+{
+  "0": {
+    "A Negative": 11,
+    "A Positive": 21,
+    "AB Negative": 7,
+    "AB Positive": 20,
+    "B Negative": 12,
+    "B Positive": 22,
+    "Bombay": 2,
+    "O Negative": 17,
+    "O Positive": 25
+  },
+  "1": {
+    "A Negative": 16,
+    "A Positive": 405,
+    "AB Negative": 11,
+    "AB Positive": 125,
+    "B Negative": 43,
+    "B Positive": 637,
+    "O Negative": 61,
+    "O Positive": 1010,
+    "Unknown": 43
+  },
+  "2": {
+    "A Negative": 5,
+    "A Positive": 40,
+    "AB Negative": 4,
+    "AB Positive": 14,
+    "B Positive": 36,
+    "O Positive": 1,
+    "Unknown": 1
+  },
+  "3": {
+    "A Positive": 7,
+    "AB Positive": 3,
+    "B Positive": 16,
+    "O Negative": 1,
+    "O Positive": 8
+  },
+  "4": {
+    "A Positive": 22,
+    "AB Positive": 10,
+    "B Negative": 4,
+    "B Positive": 79,
+    "O Negative": 6,
+    "O Positive": 131
+  },
+  "5": {
+    "A Negative": 7,
+    "A Positive": 47,
+    "AB Negative": 5,
+    "AB Positive": 26,
+    "B Negative": 7,
+    "B Positive": 102,
+    "O Negative": 7,
+    "O Positive": 80
+  },
+  "6": {
+    "A Positive": 3,
+    "AB Positive": 5,
+    "B Negative": 1,
+    "B Positive": 14,
+    "O Negative": 1,
+    "O Positive": 26
+  },
+  "7": {
+    "A Positive": 5,
+    "AB Negative": 1,
+    "AB Positive": 2,
+    "B Negative": 1,
+    "B Positive": 27,
+    "O Positive": 10
+  }
+}

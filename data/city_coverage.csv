@@ -1,0 +1,57 @@
+city_cluster,blood_group,eligible_donor_count
+0.0,A Negative,11
+0.0,A Positive,21
+0.0,AB Negative,7
+0.0,AB Positive,20
+0.0,B Negative,12
+0.0,B Positive,22
+0.0,Bombay,2
+0.0,O Negative,17
+0.0,O Positive,25
+1.0,A Negative,16
+1.0,A Positive,405
+1.0,AB Negative,11
+1.0,AB Positive,125
+1.0,B Negative,43
+1.0,B Positive,637
+1.0,O Negative,61
+1.0,O Positive,1010
+1.0,Unknown,43
+2.0,A Negative,5
+2.0,A Positive,40
+2.0,AB Negative,4
+2.0,AB Positive,14
+2.0,B Positive,36
+2.0,O Positive,1
+2.0,Unknown,1
+3.0,A Positive,7
+3.0,AB Positive,3
+3.0,B Positive,16
+3.0,O Negative,1
+3.0,O Positive,8
+4.0,A Positive,22
+4.0,AB Positive,10
+4.0,B Negative,4
+4.0,B Positive,79
+4.0,O Negative,6
+4.0,O Positive,131
+5.0,A Negative,7
+5.0,A Positive,47
+5.0,AB Negative,5
+5.0,AB Positive,26
+5.0,B Negative,7
+5.0,B Positive,102
+5.0,O Negative,7
+5.0,O Positive,80
+6.0,A Positive,3
+6.0,AB Positive,5
+6.0,B Negative,1
+6.0,B Positive,14
+6.0,O Negative,1
+6.0,O Positive,26
+7.0,A Positive,5
+7.0,AB Negative,1
+7.0,AB Positive,2
+7.0,B Negative,1
+7.0,B Positive,27
+7.0,O Positive,10

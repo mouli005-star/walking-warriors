@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+
+  # PostgreSQL — local replacement for AWS Aurora Serverless v2
+  db:
+    image: postgres:15
+    container_name: bloodbridge_db
+    environment:
+      POSTGRES_DB: bloodbridge
+      POSTGRES_USER: bloodbridge_user
+      POSTGRES_PASSWORD: bloodbridge_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bloodbridge_user -d bloodbridge"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # LocalStack — local replacement for AWS SQS/SNS/EventBridge/S3
+  localstack:
+    image: localstack/localstack:3.0
+    container_name: bloodbridge_localstack
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=sqs,sns,events,s3,lambda
+      - DEBUG=0
+      - DEFAULT_REGION=us-east-1
+    volumes:
+      - localstack_data:/var/lib/localstack
+
+  # FastAPI backend
+  backend:
+    build: ./backend
+    container_name: bloodbridge_backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://bloodbridge_user:bloodbridge_pass@db:5432/bloodbridge
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_DEFAULT_REGION=us-east-1
+      - LOCALSTACK_URL=http://localstack:4566
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - ENVIRONMENT=local
+    depends_on:
+      db:
+        condition: service_healthy
+      localstack:
+        condition: service_started
+    volumes:
+      - ./backend:/app
+      - ./data:/data
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+volumes:
+  postgres_data:
+  localstack_data:

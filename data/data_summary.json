@@ -1,0 +1,29 @@
+{
+  "total_records": 10027,
+  "patients": 84,
+  "bridge_donors": 2071,
+  "emergency_donors": 2393,
+  "guest_donors": 2420,
+  "eligible_donors": 9444,
+  "high_churn_risk": 1377,
+  "medium_churn_risk": 595,
+  "avg_rfmt_bridge": 33.9,
+  "avg_rfmt_emergency": 30.37,
+  "avg_rfmt_guest": 16.21,
+  "blood_groups": {
+    "AB Positive": 2618,
+    "B Positive": 2189,
+    "O Positive": 1979,
+    "A Positive": 897,
+    "Unknown": 160,
+    "O Negative": 122,
+    "B Negative": 94,
+    "A Negative": 54,
+    "AB Negative": 36,
+    "Bombay": 2
+  },
+  "city_clusters": 8,
+  "donors_with_location": 10003,
+  "bridge_relationships": 625,
+  "scoring_note": "base_rfmt max=100, D (distance) added dynamically at cascade time, final match score max=115"
+}
