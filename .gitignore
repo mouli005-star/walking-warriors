@@ -11,3 +11,6 @@ build/
 venv/
 *.log
 .DS_Store
+
+apprunner.json
+trust-policy.json
